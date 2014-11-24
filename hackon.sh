@@ -28,14 +28,14 @@ stophacking() {
     done
 
     # Then unset anything that was set just for this environment
-    for field in ${(s.:.)_UNSET_VARS}
+    for field in ${(s.:.)_HACKON_VARS}
     do
         echo "Unsetting $field"
         unset $field
     done
 
     unset _OVERRIDES
-    unset _UNSET_VARS
+    unset _HACKON_VARS
 
     PS1=$_OLD_PS1
     unset _OLD_PS1
@@ -94,10 +94,10 @@ sethackenv() {
     echo "# Setup $1
 echo $1=$2
 export $1=$2
-_UNSET_VARS=$1:\$_UNSET_VARS
+_HACKON_VARS=$1:\$_HACKON_VARS
 " >> $HACKON_ENV_FILE
     export $1=$2
-    _UNSET_VARS=$1:$_UNSET_VARS
+    _HACKON_VARS=$1:$_HACKON_VARS
 }
 
 hackon() {
