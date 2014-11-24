@@ -81,9 +81,14 @@ restore() {
 }
 
 sethackenv() {
-    if [[ $HACKON_ACTIVE_ENV = "" ]];
+    if [[ $HACKON_ACTIVE_ENV == "" ]];
     then
         echo "You must activate a hack environment first!"
+        return
+    fi
+    if [[ $1 == "" || $2 == "" ]];
+    then
+        echo "usage: sethackenv <ENV_VARIABLE> <value>"
         return
     fi
     echo "# Setup $1
