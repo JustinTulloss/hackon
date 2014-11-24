@@ -1,4 +1,6 @@
-HACKON_ACTIVE_ENV=''
+# You must source this! Executing it will do nothing for you
+
+HACKON_ACTIVE_ENV=
 
 if [[ $HACKON_ENV_HOME == "" ]];
 then
@@ -19,14 +21,17 @@ stophacking() {
         echo "Not currently hacking on anything!"
         return
     fi
-    for field in $_UNSET_VARS
+    # First restore everything we overrode
+    for override in ${(s.:.)_OVERRIDES}
+    do
+        restore $override
+    done
+
+    # Then unset anything that was set just for this environment
+    for field in ${(s.:.)_UNSET_VARS}
     do
         echo "Unsetting $field"
         unset $field
-    done
-    for override in $_OVERRIDES
-    do
-        restore $override
     done
 
     unset _OVERRIDES
@@ -82,10 +87,12 @@ sethackenv() {
         return
     fi
     echo "# Setup $1
-    echo $1=$2
-    export $1=$2
-    _UNSET_VARS=$1:\$_UNSET_VARS
-    " >> $HACKON_ENV_FILE
+echo $1=$2
+export $1=$2
+_UNSET_VARS=$1:\$_UNSET_VARS
+" >> $HACKON_ENV_FILE
+export $1=$2
+_UNSET_VARS=$1:$_UNSET_VARS
 }
 
 hackon() {
