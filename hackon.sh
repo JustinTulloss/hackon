@@ -96,8 +96,8 @@ echo $1=$2
 export $1=$2
 _UNSET_VARS=$1:\$_UNSET_VARS
 " >> $HACKON_ENV_FILE
-export $1=$2
-_UNSET_VARS=$1:$_UNSET_VARS
+    export $1=$2
+    _UNSET_VARS=$1:$_UNSET_VARS
 }
 
 hackon() {
