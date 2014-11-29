@@ -115,4 +115,12 @@ hackon() {
     PS1="[%{$fg[red]%}$HACKON_ACTIVE_ENV%{$reset_color%}]"$PS1
 }
 
+# Shell completions for ZSH, they're pretty simple
+if [[ $SHELL =~ 'zsh' ]]
+then
+    compdef '_files -W $HACKON_ENV_HOME' hackon
+    compdef '_printenv' override
+    compdef '_printenv' restore
+fi
+
 mkdir -p $HACKON_ENV_HOME
