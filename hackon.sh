@@ -12,10 +12,10 @@ _ensureHackEnv() {
     then
         echo "Creating environment \"$1\""
         cat > $HACKON_ENV_FILE <<-EOF
-export sethackenv=_sethackenv
-export stophacking=_stophacking
-export override=_override
-export restore=_restore
+alias sethackenv=_sethackenv
+alias stophacking=_stophacking
+alias override=_override
+alias restore=_restore
 EOF
     fi
 }
@@ -47,34 +47,40 @@ _stophacking() {
     unset HACKON_ENV_FILE
     unset HACKON_ACTIVE_ENV
 
-    # Unset all the functions so they don't appear when you're not in an
+    # Unalias all the functions so they don't appear when you're not in an
     # active hackon env.
-    unset restore
-    unset override
-    unset stophacking
-    unset sethackenv
+    unalias restore
+    unalias override
+    unalias stophacking
+    unalias sethackenv
 }
 
 _override() {
-    if [[ $1 == "" || $2 == "" ]];
-    then
-        echo "usage: override <ENV_VARIABLE> <value>"
-        return
-    fi
     if [[ $HACKON_ACTIVE_ENV == "" ]];
     then
         echo "Not currently hacking on anything! Not overriding $1"
         return
     fi
-    local OLD_VAR=_OLD_$1
-    export _OLD_$1=`printenv $1`
-    if [[ $OLD_VAR == "" ]];
-    then
-        echo "$1 is not set! Not overriding..."
-        return
-    fi
-    export $1=$2
-    _OVERRIDES=$1:$_OVERRIDES
+    for envpair in $*
+    do
+        echo $envpair
+        local var=${${(s:=:)envpair}[1]}
+        local val=${${(s:=:)envpair}[2]}
+        if [[ $var == "" || $val == "" ]]
+        then
+            echo "usage: override [<ENV_VARIABLE>=<value> ...]"
+            return
+        fi
+        local OLD_VAR=_OLD_$var
+        export _OLD_$var=`printenv $var`
+        if [[ $OLD_VAR == "" ]];
+        then
+            echo "$var is not set! Not overriding..."
+            return
+        fi
+        export $var=$val
+        _OVERRIDES=$var:$_OVERRIDES
+    done
 }
 
 _restore() {
@@ -98,18 +104,24 @@ _sethackenv() {
         echo "You must activate a hack environment first!"
         return
     fi
-    if [[ $1 == "" || $2 == "" ]];
-    then
-        echo "usage: sethackenv <ENV_VARIABLE> <value>"
-        return
-    fi
-    echo "# Setup $1
-echo $1=$2
-export $1=$2
-_HACKON_VARS=$1:\$_HACKON_VARS
+    for envpair in $*
+    do
+        echo $envpair
+        local var=${${(s:=:)envpair}[1]}
+        local val=${${(s:=:)envpair}[2]}
+        if [[ $var == "" || $val == "" ]]
+        then
+            echo "usage: sethackenv [<ENV_VARIABLE>=<value> ...]"
+            return
+        fi
+        echo "# Setup $var
+echo $var=$val
+export $var=$val
+_HACKON_VARS=$var:\$_HACKON_VARS
 " >> $HACKON_ENV_FILE
-    export $1=$2
-    _HACKON_VARS=$1:$_HACKON_VARS
+        export $var=$val
+        _HACKON_VARS=$var:$_HACKON_VARS
+    done
 }
 
 hackon() {
@@ -131,7 +143,7 @@ hackon() {
 if [[ $SHELL =~ 'zsh' ]]
 then
     compdef '_files -W $HACKON_ENV_HOME' hackon
-    compdef '_printenv' override
+    compdef '_env' override
     compdef '_printenv' restore
 fi
 
