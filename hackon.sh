@@ -29,7 +29,7 @@ _stophacking() {
     # First restore everything we overrode
     for override in ${(s.:.)_OVERRIDES}
     do
-        restore $override
+        _restore $override
     done
 
     # Then unset anything that was set just for this environment
