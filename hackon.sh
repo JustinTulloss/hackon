@@ -11,11 +11,16 @@ _ensureHackEnv() {
     if [ ! -e $HACKON_ENV_FILE ];
     then
         echo "Creating environment \"$1\""
-        touch $HACKON_ENV_FILE;
+        cat > $HACKON_ENV_FILE <<-EOF
+export sethackenv=_sethackenv
+export stophacking=_stophacking
+export override=_override
+export restore=_restore
+EOF
     fi
 }
 
-stophacking() {
+_stophacking() {
     if [[ $HACKON_ACTIVE_ENV = "" ]];
     then
         echo "Not currently hacking on anything!"
@@ -41,9 +46,16 @@ stophacking() {
     unset _OLD_PS1
     unset HACKON_ENV_FILE
     unset HACKON_ACTIVE_ENV
+
+    # Unset all the functions so they don't appear when you're not in an
+    # active hackon env.
+    unset restore
+    unset override
+    unset stophacking
+    unset sethackenv
 }
 
-override() {
+_override() {
     if [[ $1 == "" || $2 == "" ]];
     then
         echo "usage: override <ENV_VARIABLE> <value>"
@@ -65,7 +77,7 @@ override() {
     _OVERRIDES=$1:$_OVERRIDES
 }
 
-restore() {
+_restore() {
     if [[ $1 == "" ]];
     then
         echo "usage: restore <ENV_VARIABLE>"
@@ -80,7 +92,7 @@ restore() {
     unset _OLD_$1
 }
 
-sethackenv() {
+_sethackenv() {
     if [[ $HACKON_ACTIVE_ENV == "" ]];
     then
         echo "You must activate a hack environment first!"
