@@ -131,10 +131,17 @@ hackon() {
         echo "Run \`stophacking\` to do this."
         return
     fi
-    HACKON_ENV_FILE=$HACKON_ENV_HOME/$1
-    _ensureHackEnv $1
+    if [[ $1 == "." ]];
+    then
+        HACKON_ENV_FILE="./.hackenv"
+        # Gets the basename of the pwd
+        HACKON_ACTIVE_ENV=${PWD##*/}
+    else
+        HACKON_ENV_FILE=$HACKON_ENV_HOME/$1
+        HACKON_ACTIVE_ENV=$1
+    fi
+    _ensureHackEnv $HACKON_ACTIVE_ENV
     source $HACKON_ENV_FILE
-    HACKON_ACTIVE_ENV=$1
     _OLD_PS1=$PS1
     PS1="[%{$fg[red]%}$HACKON_ACTIVE_ENV%{$reset_color%}]"$PS1
 }
