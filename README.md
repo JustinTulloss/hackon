@@ -24,12 +24,12 @@ Only one environment can be active at a time.
 
 This does not unset any of the currently active environment variables. Instead it mixes the saved environment into the current environment.
 
-#### `sethackenv <ENV_VARIABLE> <value>`
+#### `sethackenv <ENV_VARIABLE>=<value> [<ENV_VARIABLE>=<value>...]`
 Sets and saves a variable to `value`. Whenever you restore the environment by calling `hackon <env>`, this environment variable will be restored.
 
 There's currently no command to unset a variable, but you can overwrite the variable by setting it again. It's also trivial to modify by editing `$HACKON_ENV_HOME/<env>`
 
-#### `override <ENV_VARIABLE> <value>`
+#### `override <ENV_VARIABLE>=<value> [<ENV_VARIABLE>=<value>...]`
 Temporarily overrides an environment variable with the specified `value`. This won't be saved, so if you call `stophacking` this value will be lost. Call `restore <ENV_VARIABLE>` to undo this operation.
 
 This can be applied to any environment variable, not just your variables set by `sethackenv`, but you do need to have some hackon environment active.
